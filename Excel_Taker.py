@@ -209,7 +209,6 @@ def start_processing_thread(action):
 
 
 
-
 # == UI Setup ==
 root = TkinterDnD.Tk()  # Инициализируем TkinterDnD
 root.title("Excel File Transfer")
