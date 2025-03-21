@@ -152,23 +152,23 @@ for i in tqdm(range(0, len(Num_SERT))):
             elif not os.path.exists(pathListSI[j]):
                 os.makedirs(pathListSI[j])
 
-    # Создание папки ИК1 и ее содержимого
-    if not os.path.exists(pathIK1):
-        for j in range(0, len(pathlistIK1)):
-            if not os.path.exists(pathlistIK1[j]):
-                os.makedirs(pathlistIK1[j])
-
-    # Создание папки ИК2 и ее содержимого
-    if not os.path.exists(pathIK2):
-        for j in range(0, len(pathlistIK2)):
-            if not os.path.exists(pathlistIK2[j]):
-                os.makedirs(pathlistIK2[j])
-
-   # Создание папки ИК3 и ее содержимого
-    if not os.path.exists(pathIK3):
-        for j in range(0, len(pathlistIK3)):
-            if not os.path.exists(pathlistIK3[j]):
-                os.makedirs(pathlistIK3[j])
+   #  # Создание папки ИК1 и ее содержимого
+   #  if not os.path.exists(pathIK1):
+   #      for j in range(0, len(pathlistIK1)):
+   #          if not os.path.exists(pathlistIK1[j]):
+   #              os.makedirs(pathlistIK1[j])
+   #
+   #  # Создание папки ИК2 и ее содержимого
+   #  if not os.path.exists(pathIK2):
+   #      for j in range(0, len(pathlistIK2)):
+   #          if not os.path.exists(pathlistIK2[j]):
+   #              os.makedirs(pathlistIK2[j])
+   #
+   # # Создание папки ИК3 и ее содержимого
+   #  if not os.path.exists(pathIK3):
+   #      for j in range(0, len(pathlistIK3)):
+   #          if not os.path.exists(pathlistIK3[j]):
+   #              os.makedirs(pathlistIK3[j])
 
         
 print('Successful!')
