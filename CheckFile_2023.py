@@ -72,25 +72,24 @@ for i in tqdm(range(0, len(Num_SERT)), desc='Идет проверка папо�
     for j in range(0, 13):
         try:
             contents = os.listdir(listF[j])
+
             # Для папок с 1 файлом
-            if len(listDest[j]) == 2 and j != 3 and j != 5:
+            if len(listDest[j]) == 2 and j != 3 and j != 5 and j != 0 and j != 12:
                 if len(contents) == 1 and listF[j] != listDest[j][0]:
                     os.rename(listF[j], listDest[j][0])
                 elif len(contents) == 0 and listF[j] != listDest[j][1]:
                     os.rename(listF[j], listDest[j][1])
-                elif len(contents) > 1 and j != 12:
+                elif len(contents) > 1:
                     worrymessage(listF[j], len(contents), '1')
 
+            # # Для папки 0 отдельно
             # if j == 0:
             #     if len(contents) == 0 and listF[j] != listDest[j][2]:
             #         os.rename(listF[j], listDest[j][2])
-            #
             #     elif len(contents) == 2 and listF[j] != listDest[j][0]:
             #         os.rename(listF[j], listDest[j][0])
-            #
             #     elif len(contents) == 1 and listF[j] != listDest[j][1]:
             #         os.rename(listF[j], listDest[j][1])
-            #
             #         worrymessage(listF[j], contents, '1')
 
             # Для папки 3 отдельно
@@ -102,8 +101,8 @@ for i in tqdm(range(0, len(Num_SERT)), desc='Идет проверка папо�
                 elif len(contents) > 4:
                     worrymessage(listF[j], len(contents), '1')
 
-            # Для папки 5 отдельно
-            elif j == 5:
+            # Для папки 5 и 12 отдельно
+            elif j == 5 or j == 12:
                 if len(contents) > 0 and listF[j] != listDest[j][0]:
                     os.rename(listF[j], listDest[j][0])
                 elif len(contents) == 0 and listF[j] != listDest[j][1]:
@@ -111,16 +110,6 @@ for i in tqdm(range(0, len(Num_SERT)), desc='Идет проверка папо�
                 elif len(contents) > 20:
                     worrymessage(listF[j], len(contents), 'не так много')
 
-            # # Для папок с 2 файлами
-            # elif len(listDest[j]) == 3:
-            #     if len(contents) == 2 and listF[j] != listDest[j][0]:
-            #         os.rename(listF[j], listDest[j][0])
-            #     elif len(contents) == 1 and listF[j] != listDest[j][1]:
-            #         os.rename(listF[j], listDest[j][1])
-            #     elif len(contents) == 0 and listF[j] != listDest[j][2]:
-            #         os.rename(listF[j], listDest[j][2])
-            #     elif len(contents) > 2 and j != 3:
-            #         worrymessage(listF[j], len(contents), '2')
         except FileNotFoundError:
             print(f"Папка '{listF[j]}' не существует.")
 
