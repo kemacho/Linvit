@@ -1,3 +1,4 @@
+
 import tkinter as tk
 from tkinter import filedialog, ttk, messagebox
 import openpyxl
@@ -6,6 +7,10 @@ from datetime import datetime
 import threading
 from tkinterdnd2 import DND_FILES, TkinterDnD
 from openpyxl.utils import get_column_letter
+import shutil
+
+# Путь к файлу-шаблону.  Укажите актуальный путь!
+TEMPLATE_FILE_PATH = rf'C:\Users\Кирилл\Desktop\PythonProject\Реестр применения СИ 2024 Образец.xlsx'
 
 # Функция для форматирования даты
 def format_date(date_value):
@@ -19,6 +24,7 @@ def process_files(action):
     """
     Обрабатывает выбранные файлы, используя заранее известный индекс листа.
     """
+    global cell_value1, cell_value2, cell_value3, cell_value4, cell_value4_1, cell_value5, cell_value6, cell_value7, cell_value8, cell_value10, cell_value10_1, cell_value9
     update_status("Начало обработки файлов...")  # Обновление статуса
 
     if not file_paths:
@@ -50,16 +56,20 @@ def process_files(action):
             update_status("Обработка прервана пользователем.")
             return
 
-        output_workbook = openpyxl.Workbook()
-        output_sheet = output_workbook.active
-        output_sheet['A1'] = "Номер Протокола"
-        output_sheet['B1'] = "Адрес"
-        output_sheet['C1'] = "Дата начала испытаний"
-        output_sheet['D1'] = "Дата окончания испытаний"
-        output_sheet['E1'] = "Прибор 1"
-        output_sheet['F1'] = "Заводской номер Прибора 1"
-        output_sheet['G1'] = "Прибор 1"
-        output_sheet['H1'] = "Заводской номер Прибора 2"
+        # Копируем файл шаблона
+        try:
+            shutil.copy(TEMPLATE_FILE_PATH, save_path)
+            output_workbook = openpyxl.load_workbook(save_path)
+            output_sheet = output_workbook.active
+        except FileNotFoundError:
+            messagebox.showerror("Ошибка", f"Файл шаблона не найден: {TEMPLATE_FILE_PATH}")
+            update_status(f"Ошибка: Файл шаблона не найден - {TEMPLATE_FILE_PATH}")
+            return
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Ошибка при копировании шаблона: {e}")
+            update_status(f"Ошибка: Не удалось скопировать шаблон - {TEMPLATE_FILE_PATH}. Ошибка: {e}")
+            return
+
     else:
         messagebox.showerror("Ошибка", "Некорректное действие.")
         update_status("Ошибка: Некорректное действие.")
@@ -73,59 +83,50 @@ def process_files(action):
     for i, file_path in enumerate(file_paths):
         try:
             update_status(f"Обработка файла {i+1} из {total_files}: {os.path.basename(file_path)}")
+
             workbook = openpyxl.load_workbook(file_path, data_only=True, read_only=True)
-            sheet_names = workbook.sheetnames
-
-
             sheet1 = workbook['Титул']
             sheet2 = workbook['Протокол']
-            sheet6 = workbook['Записи']
+            sheet3 = workbook['Записи']
 
-            # cell_value1 = sheet2['BE31'].value
-            # cell_value2 = sheet2['AG31'].value
-            # cell_value3 = sheet2['A19'].value
-            # cell_value4 = sheet1['A35'].value
-            # cell_value4_1 = sheet1['A36'].value
-            # cell_value5 = format_date(sheet2['M22'].value)
-            # cell_value6 = format_date(sheet2['M23'].value)
-            # cell_value7 = sheet6['BZ37'].value
-            # cell_value8 = sheet2['I18'].value
-            # cell_value9 = sheet1['BC29'].value
-            # cell_value10 = sheet2['AG32'].value
-            # cell_value10_1 = sheet2['BE32'].value
+            TermoGig = str(sheet3['AC19'].value)
 
+            if 'EClerk' in TermoGig:
 
-            # Заводской номер 1
-            cell_value1 = sheet2['BE35'].value
-            # Тип СИ 1
-            cell_value2 = sheet2['AG35'].value
+                cell_value1 = sheet2['BE31'].value
+                cell_value2 = sheet2['AG31'].value
+                cell_value3 = sheet2['A19'].value
+                cell_value4 = sheet1['A35'].value
+                cell_value4_1 = sheet1['A36'].value
+                if cell_value4_1 is None:
+                    cell_value4_1 = ''
+                cell_value5 = format_date(sheet2['M22'].value)
+                cell_value6 = format_date(sheet2['M23'].value)
+                cell_value7 = sheet3['BZ37'].value
+                cell_value8 = sheet2['I18'].value
+                cell_value9 = sheet1['BC29'].value
+                cell_value10 = sheet2['AG32'].value
+                cell_value10_1 = sheet2['BE32'].value
 
-            # Место нахождения СИ (регион)
-            cell_value3 = sheet2['R21'].value
+            elif 'ИВА' in TermoGig:
 
-            # Наименование организации, владельца пунктов контроля КЭ
-            cell_value4 = sheet1['A35'].value
-            cell_value4_1 = sheet1['A36'].value
+                cell_value1 = sheet2['BE35'].value               # Заводской номер 1
+                cell_value2 = sheet2['AG35'].value               # Тип СИ 1
+                cell_value3 = sheet2['R21'].value                # Место нахождения СИ (регион)
+                cell_value4 = sheet1['A35'].value                # Наименование организации, владельца пунктов контроля КЭ
+                cell_value4_1 = sheet1['A36'].value
+                if cell_value4_1 is None:
+                    cell_value4_1 = ''
+                cell_value5 = format_date(sheet2['M26'].value)   # Дата передачи СИ (начало испытаний)
+                cell_value6 = format_date(sheet2['M27'].value)   # Дата возврата СИ (окончание испытаний)
+                cell_value7 = sheet3['BZ37'].value               # Ответственный за прием / возврат СИ (измерения провел)
+                cell_value8 = sheet2['AS19'].value               # Место установки
+                cell_value9 = sheet1['BC29'].value               # Номер протокола
+                cell_value10 = sheet2['AG36'].value              # Тип СИ 2
+                cell_value10_1 = sheet2['BE36'].value            # Заводской номер 2
 
-
-            # Дата передачи СИ (начало испытаний)
-            cell_value5 = format_date(sheet2['M26'].value)
-            # Дата возврата СИ (окончание испытаний)
-            cell_value6 = format_date(sheet2['M27'].value)
-
-            # Ответственный за прием / возврат СИ (измерения провел)
-            cell_value7 = sheet6['BZ37'].value
-
-            # Место установки
-            cell_value8 = sheet2['AS19'].value
-
-            # Номер протокола
-            cell_value9 = sheet1['BC29'].value
-
-            # Тип СИ 2
-            cell_value10 = sheet2['AG36'].value
-            # Заводской номер 2
-            cell_value10_1 = sheet2['BE36'].value
+            PorNum0 = cell_value9.split('/')
+            PorNum = PorNum0[0] + '.' + PorNum0[1]
 
             output_sheet[f'C{row_index}'] = cell_value1
             output_sheet[f'D{row_index}'] = cell_value2
@@ -136,7 +137,8 @@ def process_files(action):
             output_sheet[f'J{row_index}'] = cell_value7
             output_sheet[f'O{row_index}'] = cell_value8
             output_sheet[f'P{row_index}'] = cell_value9
-            output_sheet[f'Q{row_index}'] = str(cell_value10) + ' Зав №: ' + str(cell_value10_1)
+            output_sheet[f'Q{row_index}'] = str(cell_value10) + ' Зав. №: ' + str(cell_value10_1)
+            output_sheet[f'S{row_index}'] = PorNum
 
             row_index += 1
 
@@ -152,10 +154,9 @@ def process_files(action):
 
     try:
         update_status("Сохранение файла...")
-        if action == "new": # Только для новых файлов
-            adjust_column_width(output_sheet)
 
         output_workbook.save(save_path)
+
         messagebox.showinfo("Успех", f"Данные успешно записаны в файл: {save_path}")
         update_status(f"Данные успешно записаны в файл: {save_path}")
 
@@ -168,11 +169,6 @@ def process_files(action):
 
     root.after(0, processing_complete)  # Сообщение о завершении
 
-
-def adjust_column_width(sheet):
-    for column_cells in sheet.columns:
-        length = max(len(str(cell.value)) for cell in column_cells)
-        sheet.column_dimensions[get_column_letter(column_cells[0].column)].width = length + 2  # +2 для небольшого отступа
 
 def update_progress():
     """Обновляет значение прогресс-бара."""
