@@ -14,12 +14,6 @@ def format_date(date_value):
     else:
         return str(date_value or "")
 
-# Функция для форматирования времени
-def format_time(date_value):
-    if isinstance(date_value, datetime):
-        return date_value.strftime("%H:%M")
-    else:
-        return str(date_value or "")
 
 def process_files(action):
     """
@@ -79,30 +73,70 @@ def process_files(action):
     for i, file_path in enumerate(file_paths):
         try:
             update_status(f"Обработка файла {i+1} из {total_files}: {os.path.basename(file_path)}")
-            workbook = openpyxl.load_workbook(file_path, data_only=True)
+            workbook = openpyxl.load_workbook(file_path, data_only=True, read_only=True)
             sheet_names = workbook.sheetnames
-            sheet1 = workbook[sheet_names[1]]
-            sheet2 = workbook[sheet_names[2]]
 
-            cell_value1 = sheet1['BC29'].value
-            cell_value2 = sheet2['R21'].value
-            cell_value3 = format_date(sheet2['M26'].value)
-            cell_value3_1 = format_time(sheet2['AK26'].value)
-            cell_value4 = format_date(sheet2['M27'].value)
-            cell_value4_1 = format_time(sheet2['AK27'].value)
-            cell_value5 = sheet2['AG35'].value
-            cell_value6 = int(sheet2['BE35'].value)
-            cell_value7 = sheet2['AG36'].value
-            cell_value8 = int(sheet2['BE36'].value)
 
-            output_sheet[f'A{row_index}'] = cell_value1
-            output_sheet[f'B{row_index}'] = cell_value2
-            output_sheet[f'C{row_index}'] = cell_value3 + ' (' + cell_value3_1 + ')'
-            output_sheet[f'D{row_index}'] = cell_value4 + ' (' + cell_value4_1 + ')'
-            output_sheet[f'E{row_index}'] = cell_value5
-            output_sheet[f'F{row_index}'] = cell_value6
-            output_sheet[f'G{row_index}'] = cell_value7
-            output_sheet[f'H{row_index}'] = cell_value8
+            sheet1 = workbook['Титул']
+            sheet2 = workbook['Протокол']
+            sheet6 = workbook['Записи']
+
+            # cell_value1 = sheet2['BE31'].value
+            # cell_value2 = sheet2['AG31'].value
+            # cell_value3 = sheet2['A19'].value
+            # cell_value4 = sheet1['A35'].value
+            # cell_value4_1 = sheet1['A36'].value
+            # cell_value5 = format_date(sheet2['M22'].value)
+            # cell_value6 = format_date(sheet2['M23'].value)
+            # cell_value7 = sheet6['BZ37'].value
+            # cell_value8 = sheet2['I18'].value
+            # cell_value9 = sheet1['BC29'].value
+            # cell_value10 = sheet2['AG32'].value
+            # cell_value10_1 = sheet2['BE32'].value
+
+
+            # Заводской номер 1
+            cell_value1 = sheet2['BE35'].value
+            # Тип СИ 1
+            cell_value2 = sheet2['AG35'].value
+
+            # Место нахождения СИ (регион)
+            cell_value3 = sheet2['R21'].value
+
+            # Наименование организации, владельца пунктов контроля КЭ
+            cell_value4 = sheet1['A35'].value
+            cell_value4_1 = sheet1['A36'].value
+
+
+            # Дата передачи СИ (начало испытаний)
+            cell_value5 = format_date(sheet2['M26'].value)
+            # Дата возврата СИ (окончание испытаний)
+            cell_value6 = format_date(sheet2['M27'].value)
+
+            # Ответственный за прием / возврат СИ (измерения провел)
+            cell_value7 = sheet6['BZ37'].value
+
+            # Место установки
+            cell_value8 = sheet2['AS19'].value
+
+            # Номер протокола
+            cell_value9 = sheet1['BC29'].value
+
+            # Тип СИ 2
+            cell_value10 = sheet2['AG36'].value
+            # Заводской номер 2
+            cell_value10_1 = sheet2['BE36'].value
+
+            output_sheet[f'C{row_index}'] = cell_value1
+            output_sheet[f'D{row_index}'] = cell_value2
+            output_sheet[f'F{row_index}'] = cell_value3
+            output_sheet[f'G{row_index}'] = str(cell_value4) + ' ' + str(cell_value4_1)
+            output_sheet[f'H{row_index}'] = cell_value5
+            output_sheet[f'I{row_index}'] = cell_value6
+            output_sheet[f'J{row_index}'] = cell_value7
+            output_sheet[f'O{row_index}'] = cell_value8
+            output_sheet[f'P{row_index}'] = cell_value9
+            output_sheet[f'Q{row_index}'] = str(cell_value10) + ' Зав №: ' + str(cell_value10_1)
 
             row_index += 1
 
@@ -119,7 +153,7 @@ def process_files(action):
     try:
         update_status("Сохранение файла...")
         if action == "new": # Только для новых файлов
-            adjust_column_width(output_sheet) #  <----  ВЫЗОВ ФУНКЦИИ
+            adjust_column_width(output_sheet)
 
         output_workbook.save(save_path)
         messagebox.showinfo("Успех", f"Данные успешно записаны в файл: {save_path}")
