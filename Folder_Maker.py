@@ -1,23 +1,22 @@
 import os
 from tqdm import tqdm
+import shutil
 
 
 # ПУТЬ К КОРНЕВОЙ ПАПКЕ
-INpath = rf'\\192.168.34.9\линвит\ПОЛЬЗОВАТЕЛИ\USER49\!Сертификаты_2022'
+INpath = rf'\\192.168.34.9\линвит\ПОЛЬЗОВАТЕЛИ\USER49\!Сертификаты_РЖД'
 
 # Названия папок
 folder_names = os.listdir(INpath)
 
 
-
-for i in tqdm(range(0, 2)):
+for i in tqdm(range(0, len(folder_names))):
 
     name = folder_names[i]
-    pathSI = rf'\\192.168.34.9\линвит\ПОЛЬЗОВАТЕЛИ\USER49\!Сертификаты_2023\{name}\0. СИ'
-    pathIK1 = rf'\\192.168.34.9\линвит\ПОЛЬЗОВАТЕЛИ\USER49\!Сертификаты_2023\{name}\1. ИК1'
-    pathIK2 = rf'\\192.168.34.9\линвит\ПОЛЬЗОВАТЕЛИ\USER49\!Сертификаты_2023\{name}\2. ИК2'
+    pathSI = rf'{INpath}\{name}\0. СИ'
+    pathIK1 = rf'{INpath}\{name}\1. ИК-1'
+    pathIK2 = rf'{INpath}\{name}\2. ИК-2'
 
-    pathOldSi = rf'\\192.168.34.9\линвит\ПОЛЬЗОВАТЕЛИ\USER49\!Сертификаты_2023\{name}\СИ'
 
     path0 = rf'{pathSI}\0 Заявка и приложение'
     path1 = rf'{pathSI}\1 Распоряжение по заявке'
@@ -70,10 +69,9 @@ for i in tqdm(range(0, 2)):
     pathlistIK2 = [pathIK2_0, pathIK2_1, pathIK2_2, pathIK2_3, pathIK2_4, pathIK2_5, pathIK2_6, pathIK2_7, pathIK2_8]
 
 
-    # Создание папки СИ и ее содержимого
-    if os.path.exists(pathOldSi):
-        os.rename(pathOldSi, pathSI)
 
+        
+    #Создание папки СИ и ее содержимого
     if not os.path.exists(pathSI):
         for j in range(0, len(pathListSI)):
             if j == 3 and not os.path.exists(pathListSI[j]):

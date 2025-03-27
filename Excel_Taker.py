@@ -6,11 +6,10 @@ import os
 from datetime import datetime
 import threading
 from tkinterdnd2 import DND_FILES, TkinterDnD
-from openpyxl.utils import get_column_letter
 import shutil
 
-# Путь к файлу-шаблону.  Укажите актуальный путь!
-TEMPLATE_FILE_PATH = rf'C:\Users\Кирилл\Desktop\PythonProject\Реестр применения СИ 2024 Образец.xlsx'
+# Путь к файлу-шаблону
+TEMPLATE_FILE_PATH = rf'\\192.168.34.9\линвит\ПОЛЬЗОВАТЕЛИ\USER49\Реестры применения\Реестр применения СИ 2024 Образец.xlsx'
 
 # Функция для форматирования даты
 def format_date(date_value):
@@ -40,7 +39,8 @@ def process_files(action):
 
         try:
             output_workbook = openpyxl.load_workbook(save_path)
-            output_sheet = output_workbook.active
+            output_sheet = output_workbook.worksheets[0]
+            output_sheet1 = output_workbook.worksheets[1]
         except FileNotFoundError:
             messagebox.showerror("Ошибка", f"Файл не найден: {save_path}")
             update_status(f"Ошибка: Файл не найден - {save_path}")
@@ -60,7 +60,8 @@ def process_files(action):
         try:
             shutil.copy(TEMPLATE_FILE_PATH, save_path)
             output_workbook = openpyxl.load_workbook(save_path)
-            output_sheet = output_workbook.active
+            output_sheet = output_workbook.worksheets[0]
+            output_sheet1 = output_workbook.worksheets[1]
         except FileNotFoundError:
             messagebox.showerror("Ошибка", f"Файл шаблона не найден: {TEMPLATE_FILE_PATH}")
             update_status(f"Ошибка: Файл шаблона не найден - {TEMPLATE_FILE_PATH}")
@@ -76,6 +77,7 @@ def process_files(action):
         return
 
     row_index = output_sheet.max_row + 1
+    row_index1 = output_sheet1.max_row + 1
     total_files = len(file_paths)
     progress_bar['maximum'] = total_files
     progress_bar['value'] = 0
@@ -89,17 +91,16 @@ def process_files(action):
             sheet2 = workbook['Протокол']
             sheet3 = workbook['Записи']
 
-            TermoGig = str(sheet3['AC19'].value)
+            Check1 = str(sheet2['AG34'].value)
+            Check2 = str(sheet2['AG30'].value)
 
-            if 'EClerk' in TermoGig:
+            if 'Тип СИ' in Check2:
 
                 cell_value1 = sheet2['BE31'].value
                 cell_value2 = sheet2['AG31'].value
                 cell_value3 = sheet2['A19'].value
                 cell_value4 = sheet1['A35'].value
                 cell_value4_1 = sheet1['A36'].value
-                if cell_value4_1 is None:
-                    cell_value4_1 = ''
                 cell_value5 = format_date(sheet2['M22'].value)
                 cell_value6 = format_date(sheet2['M23'].value)
                 cell_value7 = sheet3['BZ37'].value
@@ -108,7 +109,7 @@ def process_files(action):
                 cell_value10 = sheet2['AG32'].value
                 cell_value10_1 = sheet2['BE32'].value
 
-            elif 'ИВА' in TermoGig:
+            elif 'Тип СИ' in Check1:
 
                 cell_value1 = sheet2['BE35'].value               # Заводской номер 1
                 cell_value2 = sheet2['AG35'].value               # Тип СИ 1
@@ -126,12 +127,16 @@ def process_files(action):
                 cell_value10_1 = sheet2['BE36'].value            # Заводской номер 2
 
             PorNum0 = cell_value9.split('/')
-            PorNum = PorNum0[0] + '.' + PorNum0[1]
+            PorNum = PorNum0[0] + ',' + PorNum0[1]
 
+            # Запись данных в первый лист
             output_sheet[f'C{row_index}'] = cell_value1
             output_sheet[f'D{row_index}'] = cell_value2
             output_sheet[f'F{row_index}'] = cell_value3
-            output_sheet[f'G{row_index}'] = str(cell_value4) + ' ' + str(cell_value4_1)
+            if cell_value4_1 is None:
+                output_sheet[f'G{row_index}'] = str(cell_value4)
+            else:
+                output_sheet[f'G{row_index}'] = str(cell_value4) + ' ' + str(cell_value4_1)
             output_sheet[f'H{row_index}'] = cell_value5
             output_sheet[f'I{row_index}'] = cell_value6
             output_sheet[f'J{row_index}'] = cell_value7
@@ -140,7 +145,25 @@ def process_files(action):
             output_sheet[f'Q{row_index}'] = str(cell_value10) + ' Зав. №: ' + str(cell_value10_1)
             output_sheet[f'S{row_index}'] = PorNum
 
+            # Запись данных во второй лист
+            output_sheet1[f'C{row_index1}'] = cell_value10_1
+            output_sheet1[f'D{row_index1}'] = cell_value10
+            output_sheet1[f'F{row_index1}'] = cell_value3
+            if cell_value4_1 is None:
+                output_sheet1[f'G{row_index1}'] = str(cell_value4)
+            else:
+                output_sheet1[f'G{row_index1}'] = str(cell_value4) + ' ' + str(cell_value4_1)
+            output_sheet1[f'H{row_index1}'] = cell_value5
+            output_sheet1[f'I{row_index1}'] = cell_value6
+            output_sheet1[f'J{row_index1}'] = cell_value7
+            output_sheet1[f'O{row_index1}'] = cell_value8
+            output_sheet1[f'P{row_index1}'] = cell_value9
+            output_sheet1[f'Q{row_index1}'] = str(cell_value2) + ' Зав. №: ' + str(cell_value1)
+            output_sheet1[f'S{row_index1}'] = PorNum
+
             row_index += 1
+            row_index1 += 1
+
 
         except FileNotFoundError:
             messagebox.showerror("Ошибка", f"Файл не найден: {file_path}")
