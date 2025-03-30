@@ -1,3 +1,4 @@
+
 import os
 from tqdm import tqdm
 import shutil
@@ -62,15 +63,12 @@ for i in tqdm(range(0, len(folder_names))):
     pathIK2_10 = rf'{pathIK2}\10 Доп. материалы'
 
 
-
     pathListSI = [path0, path1, path2, path3, path4, path5, path6, path7, path8, path9, path10, path11, path12]
     pathList_3 = [path3_1, path3_2, path3_3]
     pathlistIK1 = [pathIK1_0, pathIK1_1, pathIK1_2, pathIK1_3, pathIK1_4, pathIK1_5, pathIK1_6, pathIK1_7, pathIK1_8]
     pathlistIK2 = [pathIK2_0, pathIK2_1, pathIK2_2, pathIK2_3, pathIK2_4, pathIK2_5, pathIK2_6, pathIK2_7, pathIK2_8]
 
 
-
-        
     #Создание папки СИ и ее содержимого
     if not os.path.exists(pathSI):
         for j in range(0, len(pathListSI)):
