@@ -3,7 +3,7 @@ import glob
 from tqdm import tqdm
 
 # ПУТЬ К КОРНЕВОЙ ПАПКЕ
-INpath = rf'\\192.168.34.9\линвит\ПОЛЬЗОВАТЕЛИ\USER49\!Сертификаты_РЖД'
+INpath = rf'\\192.168.34.9\линвит\ПОЛЬЗОВАТЕЛИ\USER49\!Сертификаты РЖД тест'
 
 # Названия папок
 folder_names = os.listdir(INpath)
