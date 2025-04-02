@@ -49,7 +49,6 @@ for i in tqdm(range(0, len(folder_names))):
     pathIK1_9 = rf'{pathIK1}\9 Решение по ИК'
     pathIK1_10 = rf'{pathIK1}\10 Доп. материалы'
 
-
     pathIK2_0 = rf'{pathIK2}\0 Распоряжение'
     pathIK2_1 = rf'{pathIK2}\1 Письмо-уведомление'
     pathIK2_2 = rf'{pathIK2}\2 Программа ИК'
@@ -65,8 +64,8 @@ for i in tqdm(range(0, len(folder_names))):
 
     pathListSI = [path0, path1, path2, path3, path4, path5, path6, path7, path8, path9, path10, path11, path12]
     pathList_3 = [path3_1, path3_2, path3_3]
-    pathlistIK1 = [pathIK1_0, pathIK1_1, pathIK1_2, pathIK1_3, pathIK1_4, pathIK1_5, pathIK1_6, pathIK1_7, pathIK1_8]
-    pathlistIK2 = [pathIK2_0, pathIK2_1, pathIK2_2, pathIK2_3, pathIK2_4, pathIK2_5, pathIK2_6, pathIK2_7, pathIK2_8]
+    pathlistIK1 = [pathIK1_0, pathIK1_1, pathIK1_2, pathIK1_3, pathIK1_4, pathIK1_5, pathIK1_6, pathIK1_7, pathIK1_8, pathIK1_9, pathIK1_10]
+    pathlistIK2 = [pathIK2_0, pathIK2_1, pathIK2_2, pathIK2_3, pathIK2_4, pathIK2_5, pathIK2_6, pathIK2_7, pathIK2_8, pathIK2_9, pathIK2_10]
 
 
     #Создание папки СИ и ее содержимого
@@ -81,16 +80,14 @@ for i in tqdm(range(0, len(folder_names))):
                 os.makedirs(pathListSI[j])
 
     # Создание папки ИК1 и ее содержимого
-    if not os.path.exists(pathIK1):
-        for j in range(0, len(pathlistIK1)):
-            if not os.path.exists(pathlistIK1[j]):
-                os.makedirs(pathlistIK1[j])
+    for j in range(0, len(pathlistIK1)):
+        if not os.path.exists(pathlistIK1[j]):
+            os.makedirs(pathlistIK1[j])
 
     # Создание папки ИК2 и ее содержимого
-    if not os.path.exists(pathIK2):
-        for j in range(0, len(pathlistIK2)):
-            if not os.path.exists(pathlistIK2[j]):
-                os.makedirs(pathlistIK2[j])
+    for j in range(0, len(pathlistIK2)):
+        if not os.path.exists(pathlistIK2[j]):
+            os.makedirs(pathlistIK2[j])
 
         
 print('Successful!')

@@ -142,7 +142,7 @@ def process_files(action):
             output_sheet[f'J{row_index}'] = cell_value7
             output_sheet[f'O{row_index}'] = cell_value8
             output_sheet[f'P{row_index}'] = cell_value9
-            output_sheet[f'Q{row_index}'] = str(cell_value10) + ' Зав. №: ' + str(cell_value10_1)
+            output_sheet[f'Q{row_index}'] = str(cell_value10) + ' Зав.№: ' + str(cell_value10_1)
             output_sheet[f'S{row_index}'] = PorNum
 
             # Запись данных во второй лист
@@ -158,7 +158,7 @@ def process_files(action):
             output_sheet1[f'J{row_index1}'] = cell_value7
             output_sheet1[f'O{row_index1}'] = cell_value8
             output_sheet1[f'P{row_index1}'] = cell_value9
-            output_sheet1[f'Q{row_index1}'] = str(cell_value2) + ' Зав. №: ' + str(cell_value1)
+            output_sheet1[f'Q{row_index1}'] = str(cell_value2) + ' Зав.№: ' + str(cell_value1)
             output_sheet1[f'S{row_index1}'] = PorNum
 
             row_index += 1
