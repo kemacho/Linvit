@@ -87,12 +87,53 @@ def process_files(action):
             update_status(f"Обработка файла {i+1} из {total_files}: {os.path.basename(file_path)}")
 
             workbook = openpyxl.load_workbook(file_path, data_only=True, read_only=True)
+            worksheets = workbook.sheetnames
+
             sheet1 = workbook['Титул']
             sheet2 = workbook['Протокол']
             sheet3 = workbook['Записи']
 
+            for i in range(0, len(worksheets)):
+                if worksheets[i] == 'Протокол-3пр':
+                    sheet2 = workbook['Протокол-3пр']
+                    sheet3 = workbook['Записи-3пр']
+
             Check1 = str(sheet2['AG34'].value)
             Check2 = str(sheet2['AG30'].value)
+            Check3 = str(sheet2['AG32'].value)
+            Check4 = str(sheet2['AG33'].value)
+
+            if 'Тип СИ' in Check4:
+
+                cell_value1 = sheet2['BE34'].value               # Заводской номер 1
+                cell_value2 = sheet2['AG34'].value               # Тип СИ 1
+                cell_value3 = sheet2['R21'].value                # Место нахождения СИ (регион)
+                cell_value4 = sheet1['A32'].value                # Наименование организации, владельца пунктов контроля КЭ
+                cell_value4_1 = sheet1['A33'].value
+                if cell_value4_1 is None:
+                    cell_value4_1 = ''
+                cell_value5 = format_date(sheet2['M25'].value)   # Дата передачи СИ (начало испытаний)
+                cell_value6 = format_date(sheet2['M26'].value)   # Дата возврата СИ (окончание испытаний)
+                cell_value7 = sheet3['BZ37'].value               # Ответственный за прием / возврат СИ (измерения провел)
+                cell_value8 = sheet2['AS19'].value               # Место установки
+                cell_value9 = sheet1['BC26'].value               # Номер протокола
+                cell_value10 = sheet2['AG35'].value              # Тип СИ 2
+                cell_value10_1 = sheet2['BE35'].value            # Заводской номер 2
+
+            if 'Тип СИ' in Check3:
+
+                cell_value1 = sheet2['BE33'].value
+                cell_value2 = sheet2['AG33'].value
+                cell_value3 = sheet2['A19'].value
+                cell_value4 = sheet1['A35'].value
+                cell_value4_1 = sheet1['A36'].value
+                cell_value5 = format_date(sheet2['M24'].value)
+                cell_value6 = format_date(sheet2['M25'].value)
+                cell_value7 = sheet3['BZ37'].value
+                cell_value8 = sheet2['I17'].value
+                cell_value9 = sheet1['BC29'].value
+                cell_value10 = sheet2['AG34'].value
+                cell_value10_1 = sheet2['BE34'].value
 
             if 'Тип СИ' in Check2:
 

@@ -153,24 +153,32 @@ class WordToExcelConverter(TkinterDnD.Tk):
             i_data = []
 
             for table in doc.tables:
-                for i, row in enumerate(table.rows):
-                    for cell in row.cells:
-                        text = cell.text.upper()
-                        if "ЗАЯВИТЕЛЬ" in text:
-                            for j in range(1, 4):
-                                if i + j < len(table.rows):
-                                    z_data.append(table.rows[i + j].cells[0].text.strip())
-                                else:
-                                    z_data.append("")
+                for row_idx, row in enumerate(table.rows):
+                    row_text = [cell.text.strip() for cell in row.cells]
 
-                        if "ИЗГОТОВИТЕЛЬ" in text:
-                            for j in range(1, 4):
-                                if i + j < len(table.rows):
-                                    i_data.append(table.rows[i + j].cells[0].text.strip())
-                                else:
-                                    i_data.append("")
+                    # Проверяем каждую ячейку в строке на наличие ключевых слов
+                    for cell_idx, cell in enumerate(row.cells):
+                        text = cell.text.strip().lower()
 
-            return z_data[:3], i_data[:3]
+                        if "заявитель" in text:
+                            # Собираем 4 следующие строки из первого столбца
+                            for j in range(1, 5):
+                                if row_idx + j < len(table.rows):
+                                    if table.rows[row_idx + j].cells:  # Проверяем, что есть ячейки
+                                        z_data.append(table.rows[row_idx + j].cells[0].text.strip())
+
+                        elif "изготовитель" in text:
+                            # Собираем 4 следующие строки из первого столбца
+                            for j in range(1, 5):
+                                if row_idx + j < len(table.rows):
+                                    if table.rows[row_idx + j].cells:  # Проверяем, что есть ячейки
+                                        i_data.append(table.rows[row_idx + j].cells[0].text.strip())
+
+            # Объединяем данные в строки с переносами
+            z_result = "\n".join(z_data[:4]) if z_data else ""
+            i_result = "\n".join(i_data[:4]) if i_data else ""
+
+            return z_result, i_result
 
         except Exception as e:
             self.update_status(f"Ошибка при обработке {os.path.basename(filepath)}: {str(e)}")
@@ -210,18 +218,16 @@ class WordToExcelConverter(TkinterDnD.Tk):
             for i, filepath in enumerate(self.file_paths):
                 z_data, i_data = self.extract_data_from_word(filepath)
 
-                if z_data and i_data:
+                if z_data is not None and i_data is not None:
                     # Запись данных после "ЗАЯВИТЕЛЬ" в столбец A
-                    for j in range(3):
-                        ws.cell(row=row + j, column=1, value=z_data[j] if j < len(z_data) else "")
-                        ws.cell(row=row + j, column=1).alignment = Alignment(wrap_text=True)
+                    ws.cell(row=row, column=1, value=z_data)
+                    ws.cell(row=row, column=1).alignment = Alignment(wrap_text=True, vertical='top')
 
                     # Запись данных после "ИЗГОТОВИТЕЛЬ" в столбец B
-                    for j in range(3):
-                        ws.cell(row=row + j, column=2, value=i_data[j] if j < len(i_data) else "")
-                        ws.cell(row=row + j, column=2).alignment = Alignment(wrap_text=True)
+                    ws.cell(row=row, column=2, value=i_data)
+                    ws.cell(row=row, column=2).alignment = Alignment(wrap_text=True, vertical='top')
 
-                    row += 3
+                    row += 1  # Переходим на следующую строку
 
                 self.update_progress(i + 1)
                 self.update_status(f"Обработан файл {i + 1}/{len(self.file_paths)}")
