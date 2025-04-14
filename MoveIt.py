@@ -103,6 +103,13 @@ INpath = rf'\\192.168.34.9\линвит\ПОЛЬЗОВАТЕЛИ\USER49\!Сер�
 
 # Названия папок
 folder_names = os.listdir(INpath)
+si = '0. СИ'
+
+for i in range(0, len(folder_names)):
+    folder = os.path.join(INpath, folder_names[i])
+    folder = os.path.join(folder, si)
+    contents = os.listdir(folder)
+    print(folder, contents)
 
 # for i in tqdm(range(0, len(Num_Sert))):
 #     file1 = rf'\\192.168.34.9\линвит\ПОЛЬЗОВАТЕЛИ\USER49\Распоряжения\Расп по заявке\{Num_R[i]}.pdf'
@@ -113,25 +120,27 @@ folder_names = os.listdir(INpath)
 #         shutil.copy(file1, dest)
 #         print(file1, ' => ', dest)
 
-for i in tqdm(range(0, len(folder_names))):
-    dest = rf'\\192.168.34.9\линвит\ПОЛЬЗОВАТЕЛИ\USER49\_Решения о выдаче (печать)'
-    file = glob.glob(rf'\\192.168.34.9\линвит\ПОЛЬЗОВАТЕЛИ\USER49\РЖД исходники\Сертификаты\*{Num_Sert[i]}*\{Num_RA} - Решение*')
-    filename = file[0]
-    # filenames = os.listdir(file)
-    # for j in range(0, len(filenames)):
-    #     if not 'приложение' in filenames[j]:
-    #         filename = filenames[j]
-    print(Num_Sert[i], filename)
-
-    # new_filename = Num_Apl[i] + " " + filename
-    # new_path = os.path.join(dest, new_filename)
-    #
-    # source_file = os.path.join(file, filename)
-    # destination_file = os.path.join(dest, filename)
-    #
-    # shutil.copy(source_file, destination_file)
-    #
-    # os.rename(destination_file, new_path)
+# for i in tqdm(range(51, len(Num_Apl))):
+#     dest = rf'\\192.168.34.9\линвит\ПОЛЬЗОВАТЕЛИ\USER49\Решение о выдаче'
+#     file = glob.glob(rf'\\192.168.34.9\линвит\ПОЛЬЗОВАТЕЛИ\USER49\РЖД исходники\Сертификаты\*{Num_Sert[i]}*')
+#     filename = file[0]
+#     filenames = os.listdir(filename)
+#
+#     for j in range(0, len(filenames)):
+#         if 'РЕШЕНИЕ' and 'Р2' in filenames[j]:
+#             filename1 = filenames[j]
+#
+#
+#     new_filename = Num_Apl[i] + " " + filename1
+#     new_path = os.path.join(dest, new_filename)
+#
+#     source_file = os.path.join(filename, filename1)
+#     print(i + 1, Num_Apl[i], Num_Sert[i], filename1)
+#
+#     destination_file = os.path.join(dest, filename1)
+#
+#     shutil.copy(source_file, destination_file)
+#     os.rename(destination_file, new_path)
 
 
 
