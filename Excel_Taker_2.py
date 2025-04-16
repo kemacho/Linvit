@@ -6,6 +6,7 @@ from datetime import datetime
 import threading
 from tkinterdnd2 import DND_FILES, TkinterDnD
 import shutil
+from string import ascii_uppercase as alc
 
 # Путь к файлу-шаблону
 TEMPLATE_FILE_PATH = r'\\192.168.34.9\линвит\ПОЛЬЗОВАТЕЛИ\USER49\Программы\Шаблоны для программ\Файл для экспорта (для ИК).xlsx'
@@ -96,30 +97,44 @@ def process_files(action):
 
             sheet1 = workbook['Титул']
             sheet2 = workbook['Протокол']
+            sheet3 = workbook['Записи']
 
             for i in range(0, len(worksheets)):
                 if worksheets[i] == 'Протокол-3пр':
                     sheet2 = workbook['Протокол-3пр']
+            for i in range(0, len(worksheets)):
+                if worksheets[i] == 'Записи-3пр':
+                    sheet3 = workbook['Записи-3пр']
 
-            # Поиск ячейки с "отрицательное отклонение напряжения" в строках 50-100
+            # Поиск ячейки с "отрицательное отклонение напряжения"
             cell_value16 = None  # Значение по умолчанию
+            cell_value17 = None
             search_text = "отрицательное отклонение напряжения"
 
-
-            for row in range(70, 90):  # Поиск в строках 50-100
-                for col in range(8, 10):  # Проверяем первые 100 столбцов
+            for row in range(70, 90):  # Поиск в строках
+                for col in range(8, 10):  # Проверяем столбцы
                     cell = sheet2.cell(row=row, column=col)
                     if cell.value and search_text in str(cell.value):
-                        # Нашли ячейку, берем значение из ячейки под ней (та же колонка, строка +1)
-                        cell_value16 = sheet2.cell(row=row + 1, column=11).value
+                        # Нашли ячейку
+                        cell_value16 = sheet2.cell(row=row + 1, column=11).value # dU -
+                        cell_value17 = sheet2.cell(row=row + 3, column=11).value # dU +
                         break
                 if cell_value16 is not None:
                     break
+
+            cell_value8 = sheet3['AK6'].value  # Место в схеме
+            cell_value13 = sheet3['U9'].value  # Центр питания
+
+            if cell_value8 is None:
+                cell_value8 = '-'
+            if cell_value13 is None:
+                cell_value13 = '-'
 
             Check1 = str(sheet2['AG34'].value)
             Check2 = str(sheet2['AG32'].value)
             Check3 = str(sheet2['AG30'].value)
             Check4 = str(sheet2['AG33'].value)
+
 
             if 'Тип СИ' in Check4:
                 cell_value2 = sheet2['AG34'].value  # Тип СИ ПКЭ
@@ -138,12 +153,6 @@ def process_files(action):
                 cell_value5 = format_date(sheet2['M25'].value)  # Начало испытаний
                 cell_value6 = format_date(sheet2['M26'].value)  # Окончание испытаний
 
-                cell_value8 = sheet2['AS19'].value  # Место в схеме
-                cell_value13 = '-'  # Центр питания
-                # cell_value16 остается как найдено выше или берется из старого места
-                if cell_value16 is None:
-                    cell_value16 = sheet2['K77'].value  # dU(-)
-                cell_value17 = sheet2['K79'].value  # dU(+)
 
             elif 'Тип СИ' in Check3:
                 cell_value2 = sheet2['AG31'].value  # Тип СИ ПКЭ
@@ -162,12 +171,7 @@ def process_files(action):
                 cell_value5 = format_date(sheet2['M22'].value)  # Начало испытаний
                 cell_value6 = format_date(sheet2['M23'].value)  # Окончание испытаний
 
-                cell_value8 = sheet2['I18'].value  # Место в схеме
-                cell_value13 = sheet2['A20'].value  # Центр питания
-                # cell_value16 остается как найдено выше или берется из старого места
-                if cell_value16 is None:
-                    cell_value16 = sheet2['K77'].value  # dU(-)
-                cell_value17 = sheet2['K79'].value  # dU(+)
+
 
             elif 'Тип СИ' in Check2:
                 cell_value2 = sheet2['AG33'].value  # Тип СИ ПКЭ
@@ -186,12 +190,6 @@ def process_files(action):
                 cell_value5 = format_date(sheet2['M24'].value)  # Начало испытаний
                 cell_value6 = format_date(sheet2['M25'].value)  # Окончание испытаний
 
-                cell_value8 = sheet2['I17'].value  # Место в схеме
-                cell_value13 = '-'  # Центр питания
-                # cell_value16 остается как найдено выше или берется из старого места
-                if cell_value16 is None:
-                    cell_value16 = sheet2['K80'].value  # dU(-)
-                cell_value17 = sheet2['K82'].value  # dU(+)
 
             elif 'Тип СИ' in Check1:
                 cell_value2 = sheet2['AG35'].value  # Тип СИ ПКЭ
@@ -210,15 +208,10 @@ def process_files(action):
                 cell_value5 = format_date(sheet2['M26'].value)  # Начало испытаний
                 cell_value6 = format_date(sheet2['M27'].value)  # Окончание испытаний
 
-                cell_value8 = sheet2['AS19'].value  # Место в схеме
-                cell_value13 = sheet2['AC23'].value  # Центр питания
-                # cell_value16 остается как найдено выше или берется из старого места
-                if cell_value16 is None:
-                    cell_value16 = sheet2['K75'].value  # dU(-)
-                cell_value17 = sheet2['K77'].value  # dU(+)
 
             if cell_value4_1 is not None:
                 cell_value4 = str(cell_value4) + ' ' + str(cell_value4_1)
+
             if cell_value9 is not None:
                 Protocol_Num0 = cell_value9.split('/')
                 Protocol_Num = Protocol_Num0[0] + ',' + Protocol_Num0[1]

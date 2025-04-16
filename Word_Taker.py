@@ -150,8 +150,10 @@ class WordToExcelConverter(TkinterDnD.Tk):
     def extract_data_from_word(self, filepath):
         try:
             doc = docx.Document(filepath)
+
             z_data = []
             i_data = []
+            p_data = []
 
             for table in doc.tables:
                 for row_idx, row in enumerate(table.rows):
@@ -161,7 +163,10 @@ class WordToExcelConverter(TkinterDnD.Tk):
                     for cell_idx, cell in enumerate(row.cells):
                         text = cell.text.strip().lower()
 
-                        if "заявитель" in text:
+                        if "C-RU" in text:
+                            print('dddd')
+
+                        elif "заявитель" in text:
                             # Собираем 4 следующие строки из первого столбца
                             for j in range(1, 5):
                                 if row_idx + j < len(table.rows):
@@ -175,86 +180,84 @@ class WordToExcelConverter(TkinterDnD.Tk):
                                     if table.rows[row_idx + j].cells:  # Проверяем, что есть ячейки
                                         i_data.append(table.rows[row_idx + j].cells[0].text.strip())
 
+
             # Объединяем данные в строки с переносами
             z_result = " ".join(z_data[:4]) if z_data else ""
             i_result = " ".join(i_data[:4]) if i_data else ""
+            p_result = p_data #if p_data else ""
 
-            return z_result, i_result
+            print(z_result, i_result, p_result)
+            return z_result, i_result, p_result
 
         except Exception as e:
             self.update_status(f"Ошибка при обработке {os.path.basename(filepath)}: {str(e)}")
             return None, None
 
-    def split_z_result(self, text):
-        parts = []
-        remaining = text
 
-        # Часть 1: От начала до "место"
-        match = re.search(r'\bместо\b', remaining, re.IGNORECASE)
-        if match:
-            parts.append(remaining[:match.start()].strip())
-            remaining = remaining[match.start():]
+    def split_z_result(self, z_result):
+        parts = ['-', '-', '-', '-']
+
+        # Обработка первой и второй частей: до "место нахождения" и до "ОГРН"
+        m_mesto = re.search(r'место нахождения:', z_result)
+        if m_mesto:
+            parts[0] = z_result[:m_mesto.start()].strip()
+            remaining = z_result[m_mesto.end():]
+            m_ogrn = re.search(r'ОГРН', remaining)
+            if m_ogrn:
+                parts[1] = remaining[:m_ogrn.start()].strip()
+            else:
+                parts[1] = '-'
         else:
-            parts.append(remaining.strip())
-            remaining = ""
+            parts[0] = z_result.strip()
+            parts[1] = '-'
 
-        # Часть 2: После "нахождения:" до "ОГРН"
-        match = re.search(r'нахождения:\s*(.*?)\s*ОГРН', remaining, re.IGNORECASE | re.DOTALL)
-        if match:
-            parts.append(match.group(1).strip())
-            remaining = remaining[match.end():]
-        else:
-            parts.append("")
+        # Обработка третьей части: номер телефона
+        tel_match = re.search(r'тел\.?\s*:?\s*([+0-9()\s-]+)', z_result, re.IGNORECASE)
+        if tel_match:
+            tel_str = tel_match.group(1)
+            digits = re.sub(r'\D', '', tel_str)
+            if len(digits) == 11:
+                parts[2] = digits
 
-
-        # Часть 3: После "тел." до "e-mail:"
-        match = re.search(r'тел\.\s*(.*?)\s*e-mail:', remaining, re.IGNORECASE | re.DOTALL)
-        if match:
-            parts.append(match.group(1).strip())
-            remaining = remaining[match.end():]
-        else:
-            parts.append("")
-
-        # Часть 4: После "e-mail:"
-        parts.append(remaining)
-        # match = re.search(r'mail:\s*(.*)', remaining, re.IGNORECASE)
-        # if match:
-        #     parts.append(match.group(1).strip())
-        # else:
-        #     parts.append("")
+        # Обработка четвертой части: email
+        email_match = re.search(r'e-mail\s*:?\s*([^\s;]+?\.(?:ru|com))\b', z_result, re.IGNORECASE)
+        if email_match:
+            parts[3] = email_match.group(1)
 
         return parts
 
-    def split_i_result(self, text):
-        parts = []
-        remaining = text
 
-        # Часть 1: От начала до "адрес"
-        match = re.search(r'\bадрес\b', remaining, re.IGNORECASE)
-        if match:
-            parts.append(remaining[:match.start()].strip())
-            remaining = remaining[match.start():]
-        else:
-            parts.append(remaining.strip())
-            remaining = ""
+    def split_i_result(self, i_result):
+        parts = ['-', '-', '-']  # [до ОГРН/адреса, адрес до телефона, телефон]
 
-        # Часть 2: После "продукции:" до "тел"
-        match = re.search(r'продукции:\s*(.*?)\s*тел', remaining, re.IGNORECASE | re.DOTALL)
-        if match:
-            parts.append(match.group(1).strip())
-            remaining = remaining[match.end():]
-        else:
-            parts.append("")
+        # 1. Определяем первую часть (до ОГРН или до адреса)
+        ogrn_match = re.search(r'ОГРН', i_result)
+        address_match = re.search(r'адрес места осуществления деятельности(?: по изготовлению продукции)?:', i_result)
 
-        # Часть 3: После "тел."
-        parts.append(remaining)
-        # match = re.search(r'\.:\s*(.*)', remaining, re.IGNORECASE | re.DOTALL)
-        # if match:
-        #     parts.append(match.group(1).strip())
-        # else:
-        #     parts.append("")
+        if ogrn_match and (not address_match or ogrn_match.start() < address_match.start()):
+            parts[0] = i_result[:ogrn_match.start()].strip()
+        elif address_match:
+            parts[0] = i_result[:address_match.start()].strip()
+
+        # 2. Извлекаем адрес (от адресной части до телефона)
+        if address_match:
+            tel_match = re.search(r'тел\.?\s*:?\s*', i_result[address_match.end():], re.IGNORECASE)
+            if tel_match:
+                address_part = i_result[address_match.end():address_match.end() + tel_match.start()].strip(' ;')
+                parts[1] = address_part
+            else:
+                # Если телефон не найден, берем до конца строки
+                parts[1] = i_result[address_match.end():].strip(' ;')
+
+        # 3. Извлекаем телефон
+        tel_match = re.search(r'тел\.?\s*:?\s*([+0-9()\s-]+)', i_result, re.IGNORECASE)
+        if tel_match:
+            clean_number = re.sub(r'\D', '', tel_match.group(1))
+            if len(clean_number) == 11:
+                parts[2] = clean_number
 
         return parts
+
 
     def process_files(self, action):
         self.update_status("Начало обработки...")
@@ -293,7 +296,7 @@ class WordToExcelConverter(TkinterDnD.Tk):
                 return
 
             for i, filepath in enumerate(self.file_paths):
-                z_data, i_data = self.extract_data_from_word(filepath)
+                z_data, i_data, p_data = self.extract_data_from_word(filepath)
 
                 if z_data is not None and i_data is not None:
                     z_parts = self.split_z_result(z_data)
