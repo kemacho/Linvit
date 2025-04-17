@@ -9,6 +9,7 @@ import threading
 import re
 
 
+
 class WordToExcelConverter(TkinterDnD.Tk):
     def __init__(self):
         super().__init__()
@@ -147,6 +148,7 @@ class WordToExcelConverter(TkinterDnD.Tk):
         thread = threading.Thread(target=self.process_files, args=(action,), daemon=True)
         thread.start()
 
+
     def extract_data_from_word(self, filepath):
         try:
             doc = docx.Document(filepath)
@@ -155,18 +157,19 @@ class WordToExcelConverter(TkinterDnD.Tk):
             i_data = []
             p_data = []
 
+
             for table in doc.tables:
                 for row_idx, row in enumerate(table.rows):
                     row_text = [cell.text.strip() for cell in row.cells]
+
+                    if row_idx == 5:
+                        p_data.append(row_text[5])
 
                     # Проверяем каждую ячейку в строке на наличие ключевых слов
                     for cell_idx, cell in enumerate(row.cells):
                         text = cell.text.strip().lower()
 
-                        if "C-RU" in text:
-                            print('dddd')
-
-                        elif "заявитель" in text:
+                        if "заявитель" in text:
                             # Собираем 4 следующие строки из первого столбца
                             for j in range(1, 5):
                                 if row_idx + j < len(table.rows):
@@ -184,7 +187,7 @@ class WordToExcelConverter(TkinterDnD.Tk):
             # Объединяем данные в строки с переносами
             z_result = " ".join(z_data[:4]) if z_data else ""
             i_result = " ".join(i_data[:4]) if i_data else ""
-            p_result = p_data #if p_data else ""
+            p_result = p_data
 
             print(z_result, i_result, p_result)
             return z_result, i_result, p_result
@@ -269,7 +272,7 @@ class WordToExcelConverter(TkinterDnD.Tk):
                 wb = openpyxl.Workbook()
                 ws = wb.active
                 # Добавляем заголовки
-                headers = ["Заявитель", "Заявитель место нахождения", "Заявитель телефон", "Заявитель e-mail",
+                headers = ["Номер сертификата", "Заявитель", "Заявитель место нахождения", "Заявитель телефон", "Заявитель e-mail",
                           "Изготовитель", "Изготовитель адрес", "Изготовитель телефон"]
                 for col_idx, header in enumerate(headers, start=1):
                     ws.cell(row=1, column=col_idx, value=header)
@@ -301,7 +304,7 @@ class WordToExcelConverter(TkinterDnD.Tk):
                 if z_data is not None and i_data is not None:
                     z_parts = self.split_z_result(z_data)
                     i_parts = self.split_i_result(i_data)
-                    all_data = z_parts + i_parts
+                    all_data = p_data + z_parts + i_parts
 
                     # Запись данных в соответствующие столбцы
                     for col_idx, data in enumerate(all_data, start=1):
@@ -317,7 +320,7 @@ class WordToExcelConverter(TkinterDnD.Tk):
                 self.update_status(f"Обработан файл {i + 1}/{len(self.file_paths)}")
 
             # Настройка ширины столбцов
-            for col in ['A', 'B', 'C', 'D', 'E', 'F', 'G']:
+            for col in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
                 ws.column_dimensions[col].width = 30
 
             wb.save(save_path)
